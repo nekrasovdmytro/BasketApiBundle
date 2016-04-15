@@ -1,0 +1,156 @@
+<?php
+
+namespace Binary\Bundle\FruitBasketApiBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="item")
+ * @ORM\HasLifecycleCallbacks()
+ */
+class Item implements \JsonSerializable
+{
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Type")
+     * @ORM\JoinColumn(name="type_id", referencedColumnName="id")
+     */
+    private $type;
+
+    /**
+     * @ORM\Column(type="decimal", scale=2)
+     */
+    private $weight;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Basket", inversedBy="items")
+     * @ORM\JoinColumn(name="basket_id", referencedColumnName="id")
+     */
+    private $basket;
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function checkBacketCapacity()
+    {
+        print_r($this->basket);
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->type = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set weight
+     *
+     * @param string $weight
+     * @return Item
+     */
+    public function setWeight($weight)
+    {
+        $this->weight = $weight;
+
+        return $this;
+    }
+
+    /**
+     * Get weight
+     *
+     * @return string 
+     */
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    /**
+     * Add type
+     *
+     * @param \Binary\Bundle\FruitBasketApiBundle\Entity\Type $type
+     * @return Item
+     */
+    public function addType(\Binary\Bundle\FruitBasketApiBundle\Entity\Type $type)
+    {
+        $this->type[] = $type;
+
+        return $this;
+    }
+
+    /**
+     * Remove type
+     *
+     * @param \Binary\Bundle\FruitBasketApiBundle\Entity\Type $type
+     */
+    public function removeType(\Binary\Bundle\FruitBasketApiBundle\Entity\Type $type)
+    {
+        $this->type->removeElement($type);
+    }
+
+    /**
+     * Get type
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set basket
+     *
+     * @param \Binary\Bundle\FruitBasketApiBundle\Entity\Basket $basket
+     * @return Item
+     */
+    public function setBasket(\Binary\Bundle\FruitBasketApiBundle\Entity\Basket $basket = null)
+    {
+        $this->basket = $basket;
+
+        return $this;
+    }
+
+    /**
+     * Get basket
+     *
+     * @return \Binary\Bundle\FruitBasketApiBundle\Entity\Basket 
+     */
+    public function getBasket()
+    {
+        return $this->basket;
+    }
+
+    public function toArray()
+    {
+        return [
+            'id' => $this->getId(),
+            'type' => $this->getType(),
+            'weight' => $this->getWeight(),
+            'basket' => $this->getBasket()
+        ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
+}
