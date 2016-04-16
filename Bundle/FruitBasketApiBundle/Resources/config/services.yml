@@ -6,3 +6,10 @@ services:
         class: Binary\Bundle\FruitBasketApiBundle\Form\BasketType
         tags:
             - { name: form.type }
+
+    kernel.listener.kernel_request:
+           class: Binary\Bundle\FruitBasketApiBundle\EventListener\RouteNotFoundListener
+           arguments:
+               router: "@router"
+           tags:
+               - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }

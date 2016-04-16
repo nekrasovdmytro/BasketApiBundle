@@ -184,6 +184,7 @@ class FBApiController extends Controller
 
     /**
      * @Route("/basket/delete/{id}", name="delete_basket_action")
+     * @Method("DELETE")
      */
     public function removeBasketAction(Request $request, $id)
     {
