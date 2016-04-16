@@ -20,7 +20,6 @@ class BasketType extends AbstractType
             ->add('name', TextType::class)
             ->add('maxCapacity', TextType::class)
             ->add('submit', SubmitType::class)
-            ->setMethod("GET")
         ;
     }
     

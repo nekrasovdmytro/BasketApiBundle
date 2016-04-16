@@ -26,23 +26,40 @@ class FBApiController extends Controller
     /**
      * @Route("/add-basket", name="add_basket_action")
      * @Method("POST")
+     *
+     * Data Request Example
+     * POST api.example.local
+     * Content-type="application/json"
+     * {"name":"Basket 1", "maxCapacity":"15"}
      */
     public function addBasketAction(Request $request)
     {
+        /**
+         * @var \Symfony\Component\Validator\Validator $validator
+         */
+        $validator = $this->get("validator");
+
+        if ($request->getContentType() == 'application/json') {
+            $itemArray = json_decode($request->getContent(), true);
+        } else {
+            $itemArray = json_decode($request->get('data'), true);
+        }
+
         $basket = new Basket();
 
-        $form = $this->createForm(BasketType::class, $basket);
+        $basket->setName(!empty($itemArray['name']) ? $itemArray['name'] : '' );
+        $basket->setMaxCapacity(!empty($itemArray['maxCapacity']) ? $itemArray['maxCapacity'] : 0 );
 
-        $form->handleRequest($request);
+        $errors = $validator->validate($basket);
 
-        if ($form->isValid()) {
+        if (!count($errors)) {
             $em = $this->getEntitiesManager();
             $em->persist($basket);
             $em->flush();
 
             $data = $basket;
         } else {
-            $data = $form->getErrors(true);
+            $data = $errors;
         }
 
         return new JsonResponse($data, JsonResponse::HTTP_CREATED);
@@ -148,7 +165,7 @@ class FBApiController extends Controller
 
             $em->flush();
 
-            return new JsonResponse(sprintf("Added %s item(s)", count($itemArray['data'])));
+            return new JsonResponse($basket);
 
         } catch (RestValidationException $e) {
             return new JsonResponse($e);
