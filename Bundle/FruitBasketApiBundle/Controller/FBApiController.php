@@ -83,10 +83,18 @@ class FBApiController extends Controller
      */
     public function viewBasketByIdAction(Request $request, $id)
     {
-        $basket = $this->getBasketRepository()
-            ->findOneById($id);
+        try {
+            $basket = $this->getBasketRepository()
+                ->findOneById($id);
 
-        return new JsonResponse($basket);
+            if (!$basket) {
+                throw new \Exception("Basket not found, wrong id", JsonResponse::HTTP_NOT_FOUND);
+            }
+
+            return new JsonResponse($basket);
+        } catch (\Exception $e) {
+            return new JsonResponse($e);
+        }
     }
 
     /**
@@ -129,7 +137,7 @@ class FBApiController extends Controller
                 ->findOneById($itemArray['basket']);
 
             if (!$basket) {
-                throw new \Exception("Basket not found, wrong basket");
+                throw new \Exception("Basket not found, wrong basket", JsonResponse::HTTP_NOT_FOUND);
             }
 
             foreach ($itemArray['data'] as $data) {
@@ -145,7 +153,7 @@ class FBApiController extends Controller
                     ->findOneByName($data['type']);
 
                 if (!$type) {
-                    throw new \Exception("Type not found, wrong type");
+                    throw new \Exception("Type not found, wrong type", JsonResponse::HTTP_NOT_FOUND);
                 }
 
                 $item->setWeight($data['weight']);
@@ -165,11 +173,38 @@ class FBApiController extends Controller
 
             $em->flush();
 
-            return new JsonResponse($basket);
+            return new JsonResponse($basket, JsonResponse::HTTP_CREATED);
 
         } catch (RestValidationException $e) {
             return new JsonResponse($e);
         } catch (\Exception $e) {
+            return new JsonResponse($e);
+        }
+    }
+
+    /**
+     * @Route("/basket/delete/{id}", name="delete_basket_action")
+     */
+    public function removeBasketAction(Request $request, $id)
+    {
+        try {
+            $em = $this->getEntitiesManager();
+
+            /**
+             * @var \Binary\Bundle\FruitBasketApiBundle\Entity\Basket $basket
+             */
+            $basket = $this->getBasketRepository()
+                ->findOneById($id);
+
+            if (!$basket) {
+                throw new \Exception("Basket not found, wrong id", JsonResponse::HTTP_NOT_FOUND);
+            }
+
+            $em->remove($basket);
+            $em->flush();
+
+            return new JsonResponse(sprintf("Basket %s deleted", $id));
+        }  catch (\Exception $e) {
             return new JsonResponse($e);
         }
     }

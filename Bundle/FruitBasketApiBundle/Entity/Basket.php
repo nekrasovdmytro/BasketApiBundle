@@ -36,7 +36,7 @@ class Basket implements \JsonSerializable
     private $maxCapacity;
 
     /**
-     * @ORM\OneToMany(targetEntity="Item", mappedBy="basket")
+     * @ORM\OneToMany(targetEntity="Item" , cascade={"remove"}, mappedBy="basket")
      */
     private $contents;
 

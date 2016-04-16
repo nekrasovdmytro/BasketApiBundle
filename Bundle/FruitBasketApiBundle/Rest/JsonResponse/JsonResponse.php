@@ -45,6 +45,9 @@ class JsonResponse extends HttpFoundationJsonResponse
             $this->jsonArray->setStatus(RestStatus::ERROR_STATUS);
             $this->prepareExceptionErrorResponse($data);
 
+            $status = HttpFoundationJsonResponse::HTTP_BAD_REQUEST;
+            $data->getCode() && $status = $data->getCode();
+
         } else {
             $this->jsonArray->setData($data);
         }
