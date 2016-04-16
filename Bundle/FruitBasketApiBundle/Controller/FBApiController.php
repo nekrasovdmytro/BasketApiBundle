@@ -20,7 +20,7 @@ class FBApiController extends Controller
      */
     public function indexAction()
     {
-        return new JsonResponse(array());
+        return new JsonResponse("Rest api");
     }
 
     /**
@@ -39,7 +39,7 @@ class FBApiController extends Controller
          */
         $validator = $this->get("validator");
 
-        if ($request->getContentType() == 'application/json') {
+        if ($request->getContentType() == 'json') {
             $itemArray = json_decode($request->getContent(), true);
         } else {
             $itemArray = json_decode($request->get('data'), true);
@@ -120,7 +120,7 @@ class FBApiController extends Controller
             */
             $validator = $this->get("validator");
 
-            if ($request->getContentType() == 'application/json') {
+            if ($request->getContentType() == 'json') {
                 $itemArray = json_decode($request->getContent(), true);
             } else {
                 $itemArray = json_decode($request->get('data'), true);

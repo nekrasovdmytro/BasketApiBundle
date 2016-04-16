@@ -29,7 +29,6 @@ class RouteNotFoundListener
         $this->router = $router;
     }
 
-
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
